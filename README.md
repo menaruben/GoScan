@@ -56,16 +56,17 @@ func main() {
 ```
 After running the code above your terminal output should look like this:
 ```
-Port scanning finished in 2.498907 seconds
-+------+-------+--------------+
-| PORT | STATE |   SERVICE    |
-+------+-------+--------------+
-|   22 | open  | ssh          |
-|  445 | open  | microsoft-ds |
-|  135 | open  | rpc          |
-|  912 | open  |              |
-|  902 | open  |              |
-+------+-------+--------------+
+finished in 2.490884 seconds
++------+-------+--------------------------------+
+| PORT | STATE |            SERVICE             |
++------+-------+--------------------------------+
+|  445 | open  | Microsoft-DS (Directory        |
+|      |       | Services)                      |
+|   22 | open  | SSH (Secure Shell)             |
+|  135 | open  |                                |
+|  912 | open  |                                |
+|  902 | open  | VMware ESXi                    |
++------+-------+--------------------------------+
 ```
 
 ## License
