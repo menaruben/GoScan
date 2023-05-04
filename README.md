@@ -1,6 +1,12 @@
 # GoScan
 GoScan is a blanzingly fast port scanner written in Go.
 
+## Installation
+Move to your folder containing your go.mod and type:
+```
+go get github.com/menaruben/GoScan
+```
+
 ## Examples
 ### scan single port(s)
 In order to scan a single port(s) you can use the ```ScanPort``` function:
