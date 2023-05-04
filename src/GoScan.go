@@ -10,54 +10,37 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-var defaultServices = map[int]string{
-	1:   "tcpmux",
-	5:   "rje",
-	7:   "echo",
-	18:  "msp",
-	20:  "ftp-data",
-	21:  "ftp",
-	22:  "ssh",
-	23:  "telnet",
-	25:  "smtp",
-	29:  "msg-icp",
-	37:  "time",
-	42:  "nameserver",
-	43:  "whois",
-	49:  "tacacs",
-	53:  "domain",
-	69:  "tftp",
-	70:  "gopher",
-	79:  "finger",
-	80:  "http",
-	103: "x400",
-	108: "sna",
-	109: "pop2",
-	110: "pop3",
-	115: "sftp",
-	118: "sqlserv",
-	119: "nntp",
-	135: "rpc",
-	137: "netbios-ns",
-	139: "netbios-ssn",
-	143: "imap",
-	150: "sql-net",
-	156: "sqlsrv",
-	161: "snmp",
-	179: "bgp",
-	190: "gacp",
-	194: "irc",
-	197: "dls",
-	389: "ldap",
-	396: "netware-ip",
-	443: "https",
-	444: "snpp",
-	445: "microsoft-ds",
-	458: "appleqtc",
-	546: "dhcp-client",
-	547: "dhcp-server",
-	563: "snews",
-	569: "msrpc",
+var portServices = map[int]string{
+	21:   "FTP (File Transfer Protocol)",
+	22:   "SSH (Secure Shell)",
+	23:   "Telnet",
+	25:   "SMTP (Simple Mail Transfer Protocol)",
+	53:   "DNS (Domain Name System)",
+	67:   "BOOTP / DHCP",
+	68:   "BOOTP / DHCP",
+	80:   "HTTP (Hypertext Transfer Protocol)",
+	110:  "POP3 (Post Office Protocol version 3)",
+	119:  "NNTP (Network News Transfer Protocol)",
+	123:  "NTP (Network Time Protocol)",
+	143:  "IMAP (Internet Message Access Protocol)",
+	161:  "SNMP (Simple Network Management Protocol)",
+	194:  "IRC (Internet Relay Chat)",
+	220:  "IMAP version 3",
+	445:  "Microsoft-DS (Directory Services)",
+	443:  "HTTPS (HTTP Secure)",
+	465:  "SMTPS (SMTP Secure)",
+	587:  "SMTP (Mail Submission Agent)",
+	749:  "Kerberos administration",
+	751:  "Kerberos authentication",
+	752:  "Kerberos password (kpasswd) server",
+	902:  "VMware ESXi",
+	903:  "VMware ESXi",
+	993:  "IMAPS (IMAP Secure)",
+	995:  "POP3S (POP3 Secure)",
+	1433: "Microsoft SQL Server",
+	3306: "MySQL",
+	5432: "PostgreSQL",
+	8080: "HTTP (Alternative Port)",
 }
 
 // The ScanResult struct contains the port and its state (wether it is open or closed)
@@ -134,9 +117,9 @@ func ScanHostFast(hostname string, port_range [2]int) ([]ScanResult, time.Durati
 
 // The getService returns the service for the given port.
 func getService(port int) string {
-	_, ok := defaultServices[port]
+	_, ok := portServices[port]
 	if ok {
-		return defaultServices[port]
+		return portServices[port]
 	} else {
 		return ""
 	}
