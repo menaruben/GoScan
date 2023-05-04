@@ -69,6 +69,36 @@ finished in 2.490884 seconds
 +------+-------+--------------------------------+
 ```
 
+### scan port range with intervals
+In order to less obvious when scanning a network we can use the ```ScanHost``` function that lets us define the time interval between the scanning:
+```go
+package main
+
+import (
+	"GoScan"
+	"fmt"
+)
+
+func main() {
+	port_range := [2]int{20, 30}
+
+	// ScanHost scans all ports of a host with interval of 2 seconds between scans
+	result, runtime := ScanHost("localhost", port_range, 2)
+	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
+
+	ResultOutput(result) // prints out result table to terminal
+}
+```
+The output should still look like this:
+```
+Port scanning finished in 45.561080 seconds
++------+-------+--------------------+
+| PORT | STATE |      SERVICE       |
++------+-------+--------------------+
+|   22 | open  | SSH (Secure Shell) |
++------+-------+--------------------+
+```
+
 ## License
 ```
 MIT License
