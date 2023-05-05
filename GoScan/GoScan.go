@@ -1,6 +1,5 @@
-package main
-
-// package GoScan
+// GoScan is a blanzingly fast network/port scanner written in Go.
+package GoScan
 
 import (
 	"net"
@@ -51,7 +50,7 @@ type ScanResult struct {
 	State bool
 }
 
-// ScanPort scans a single port
+// ScanPort scans a single port.
 func ScanPort(hostname string, port int) ScanResult {
 	result := ScanResult{Port: port}
 	address := hostname + ":" + strconv.Itoa(port)
