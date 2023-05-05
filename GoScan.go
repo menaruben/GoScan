@@ -139,7 +139,7 @@ func ScanHost(hostname string, port_range [2]int, scan_interval int, timeout tim
 }
 
 // ScanHostFast scans all ports inside the port_range argument concurrently and returns all open ports.
-func ScanHostFast(hostname string, port_range [2]int) ([]ScanResult, time.Duration) {
+func ScanHostFast(hostname string, port_range [2]int, timeout time.Duration) ([]ScanResult, time.Duration) {
 	start_time := time.Now()
 	var wg sync.WaitGroup
 
@@ -151,7 +151,7 @@ func ScanHostFast(hostname string, port_range [2]int) ([]ScanResult, time.Durati
 		wg.Add(1)
 		go func(port int) {
 			defer wg.Done()
-			results <- ScanPort(hostname, port)
+			results <- ScanPort(hostname, port, timeout)
 		}(port)
 	}
 
