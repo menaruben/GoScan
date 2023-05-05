@@ -2,20 +2,61 @@
 GoScan is a blanzingly fast port scanner written in Go.
 
 ## Installation
-> ⚠️ **_NOTE:_**  This module is under heavy development. If any errors occur please file an [issue](https://github.com/menaruben/GoScan/issues). 
+> ⚠️ **_NOTE:_**  This module is under heavy development. If any errors occur please file an [issue](https://github.com/menaruben/GoScan/issues).
 Move to your folder containing your go.mod and type:
 ```
 go get github.com/menaruben/GoScan
 ```
 
 ## Examples
-### scan single port(s)
+### ValidateIpv4
+We always need to pass in ip addresses or hostnames. When we parse out the IP addresses from somewhere we can try to vaildate the parsed string with ```ValidateIpv4``` so that we can avoid errors when passing in wrong ip addresses. Here is an example on how to use it:
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/menaruben/GoScan"
+)
+
+func main() {
+	validCheck := GoScan.ValidateIpv4("192.168.100.29")
+	fmt.Println(validCheck)
+}
+```
+Output:
+```
+true
+```
+This tells us that the IPv4 address is in the correct format.
+
+### GetSubnetMask
+When scanning a network it is important to get certain information about the network such as the network address and the subnet mask in order to know all the possible IPs a network can have. The ```GetSubnetMask``` returns the subnet mask for the given suffix. Here is an example on how to use the ```GetSubnetMask``` function:
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/menaruben/GoScan"
+)
+
+func main() {
+	subnetMask := GoScan.GetSubnetMask(25)
+	fmt.Println(subnetMask)
+}
+```
+Output:
+```
+255.255.255.128
+```
+
+### ScanPort
 In order to scan a single port(s) you can use the ```ScanPort``` function:
 ```go
 package main
 
 import (
-	"GoScan"
+	"github.com/menaruben/GoScan"
 	"fmt"
 )
 
@@ -27,21 +68,21 @@ func main() {
 	fmt.Println(httpResult.Port, httpResult.State)
 }
 ```
-Now we can look at the terminal output in order to look at the results:
+Output:
 ```
 22 true
 80 false
 ```
 This means that port 22 is open and port 80 is closed.
 
-### scan port range
+### ScanHostFast
 In order to scan a port range concurrently you will need to use the ```ScanHostFast``` function. If you don't want the concurrent aspect of ```ScanHostFast``` you can replace it with the ```ScanHost``` function:
 
 ```go
 package main
 
 import (
-	"GoScan"
+	"github.com/menaruben/GoScan"
 	"fmt"
 )
 
@@ -55,7 +96,7 @@ func main() {
     GoScan.ResultOutput(result) // prints out result table to terminal
 }
 ```
-After running the code above your terminal output should look like this:
+Output:
 ```
 finished in 2.490884 seconds
 +------+-------+--------------------------------+
@@ -70,13 +111,59 @@ finished in 2.490884 seconds
 +------+-------+--------------------------------+
 ```
 
-### scan port range with intervals
+### ScanHost
 In order to less obvious when scanning a network we can use the ```ScanHost``` function that lets us define the time interval between the scanning:
 ```go
 package main
 
 import (
-	"GoScan"
+	"github.com/menaruben/GoScan"
+	"fmt"
+)
+
+func main() {
+	// scan ports 20 to 30
+	port_range := [2]int{20, 30}
+
+	// scan each port with 2 seconds interval
+	result, runtime := GoScan.ScanHost("localhost", port_range, 2)
+	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
+	fmt.Println(result)
+}
+```
+Output:
+```
+Port scanning finished in 45.630600 seconds
+[{22 true}]
+```
+
+### ExampleGetService
+This function returns the service that is mapped to the port given as the argument:
+```go
+package main
+
+import (
+	"github.com/menaruben/GoScan"
+	"fmt"
+)
+
+func main() {
+	service := GoScan.GetService(22)
+	fmt.Println(service)
+}
+```
+Output:
+```
+SSH (Secure Shell)
+```
+
+### ResultOutput
+The ```ResultOutput``` function prints out the ```[]ScanResult``` given as an argument. Here is a small example:
+```go
+package main
+
+import (
+	"github.com/menaruben/GoScan"
 	"fmt"
 )
 
@@ -90,7 +177,7 @@ func main() {
 	ResultOutput(result) // prints out result table to terminal
 }
 ```
-The output should still look like this:
+Output:
 ```
 Port scanning finished in 45.561080 seconds
 +------+-------+--------------------+

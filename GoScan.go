@@ -75,7 +75,7 @@ func GetSubnetMask(suffix int) string {
 	}
 
 	remainder := suffix % 8
-	lastOctet := int(math.Pow(2, float64((8 - remainder))))
+	lastOctet := 256 - int(math.Pow(2, float64((8-remainder))))
 	previousOctetsNum := (suffix - remainder) / 8
 
 	var octets []string
