@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	GoScan "github.com/menaruben/GoScan"
+	"github.com/menaruben/GoScan"
 )
 
 func main() {
