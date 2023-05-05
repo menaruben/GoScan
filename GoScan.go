@@ -2,6 +2,7 @@
 package GoScan
 
 import (
+	"log"
 	"math"
 	"net"
 	"os"
@@ -102,11 +103,11 @@ type ScanResult struct {
 }
 
 // ScanPort scans a single port.
-func ScanPort(hostname string, port int) ScanResult {
+func ScanPort(hostname string, port int, timeout time.Duration) ScanResult {
 	result := ScanResult{Port: port}
 	address := hostname + ":" + strconv.Itoa(port)
 
-	conn, err := net.DialTimeout("tcp", address, 12*time.Second)
+	conn, err := net.DialTimeout("tcp", address, timeout)
 
 	if err != nil {
 		result.State = false
@@ -197,4 +198,87 @@ func ResultOutput(results []ScanResult) {
 	}
 
 	table.Render()
+}
+
+// Contains information about a network.
+type NetworkInfo struct {
+	NetworkIP    string
+	SubnetMask   string
+	SubnetSuffix int
+	Hosts        []string
+}
+
+// returns wether or not an IP address is reachacble
+func IsIPReachable(ipAddr string, timeout time.Duration) bool {
+	conn, err := net.DialTimeout("tcp", ipAddr+":80", timeout)
+	if err != nil {
+		return false
+	}
+	conn.Close()
+	return true
+}
+
+func incrementHostIp(ip net.IP) {
+	for j := len(ip) - 1; j >= 0; j-- {
+		ip[j]++
+		if ip[j] > 0 {
+			break
+		}
+	}
+}
+
+// ScanNetwork returns NetworkInfo about a specific network. It contains the network IP, subnet mask/suffix and all hosts
+func ScanNetwork(netaddr string, scan_interval int, timeout time.Duration) NetworkInfo {
+	var network NetworkInfo
+	netaddrFields := strings.Split(netaddr, "/")
+
+	network.NetworkIP = netaddrFields[0]
+	SubnetSuffix, err := strconv.Atoi(netaddrFields[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	network.SubnetSuffix = SubnetSuffix
+	network.SubnetMask = GetSubnetMask(network.SubnetSuffix)
+
+	// get all hosts inside the network
+	ip, ipNet, err := net.ParseCIDR(netaddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	hostChannel := make(chan string)
+
+	// wait for all goroutines to complete
+	var wg sync.WaitGroup
+	for ip := ip.Mask(ipNet.Mask); ipNet.Contains(ip); incrementHostIp(ip) {
+		wg.Add(1)
+		go func(ip string) {
+			defer wg.Done()
+			if IsIPReachable(ip, timeout) {
+				hostChannel <- ip
+			}
+		}(ip.String())
+		time.Sleep(time.Duration(scan_interval) * time.Second)
+	}
+
+	// Wait for all goroutines to complete before closing the channel
+	go func() {
+		wg.Wait()
+		close(hostChannel)
+	}()
+
+	// Read from the channel until it's closed
+	for host := range hostChannel {
+		if host != "" {
+			network.Hosts = append(network.Hosts, host)
+		}
+	}
+
+	// remove network (first) and broadcast (last) address
+	if len(network.Hosts) >= 3 {
+		network.Hosts = network.Hosts[1 : len(network.Hosts)-1]
+	}
+
+	return network
 }

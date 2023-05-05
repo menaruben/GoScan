@@ -187,6 +187,56 @@ Port scanning finished in 45.561080 seconds
 +------+-------+--------------------+
 ```
 
+### IsIPReachable
+This function checks wether or not an IP is reachable or not and returns the boolean.
+```go
+package main
+
+import (
+	"github.com/menaruben/GoScan"
+	"fmt"
+)
+
+func main() {
+	var validCheck bool = IsIPReachable("142.250.203.100", 12*time.Second)
+	fmt.Println(validCheck)
+}
+```
+Output:
+```
+true
+```
+
+### ScanNetwork
+This function scans a network and returns a variable of type ```NetworkInfo``` which is defined like this:
+```go
+type NetworkInfo struct {
+	NetworkIP    string
+	SubnetMask   string
+	SubnetSuffix int
+	Hosts        []string
+}
+```
+
+In order to scan a network we need to use the following code:
+```go
+package main
+
+import (
+	"github.com/menaruben/GoScan"
+	"fmt"
+)
+
+func main() {
+	var myNetwork NetworkInfo = GoScan.ScanNetwork("192.168.1.0/24", 0, 12*time.Second)
+	fmt.Println(myNetwork)
+}
+```
+Output:
+```
+{192.168.1.0 255.255.255.0 24 [192.168.1.19 192.168.1.4 192.168.1.101]}
+```
+
 ## License
 ```
 MIT License
