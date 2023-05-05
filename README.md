@@ -58,11 +58,13 @@ package main
 import (
 	"github.com/menaruben/GoScan"
 	"fmt"
+	"time"
 )
 
 func main() {
-	sshResult := GoScan.ScanPort("localhost", 22)
-	httpResult := GoScan.ScanPort("localhost", 80)
+	timeout := 12*time.Second
+	sshResult := GoScan.ScanPort("localhost", 22, timeout)
+	httpResult := GoScan.ScanPort("localhost", 80, timeout)
 
 	fmt.Println(sshResult.Port, sshResult.State)
 	fmt.Println(httpResult.Port, httpResult.State)
@@ -84,13 +86,15 @@ package main
 import (
 	"github.com/menaruben/GoScan"
 	"fmt"
+	"time"
 )
 
 func main() {
     port_range := [2]int{1, 1024}
+	timeout := 12*time.Second
 
     // ScanHostFast concurrently scans all ports of a host
-    result, runtime := GoScan.ScanHostFast("localhost", port_range)
+    result, runtime := GoScan.ScanHostFast("localhost", port_range, timeout)
     fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 
     GoScan.ResultOutput(result) // prints out result table to terminal
@@ -119,14 +123,16 @@ package main
 import (
 	"github.com/menaruben/GoScan"
 	"fmt"
+	"time"
 )
 
 func main() {
 	// scan ports 20 to 30
+	timeout := 12*time.Second
 	port_range := [2]int{20, 30}
 
 	// scan each port with 2 seconds interval
-	result, runtime := GoScan.ScanHost("localhost", port_range, 2)
+	result, runtime := GoScan.ScanHost("localhost", port_range, 2, timeout)
 	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 	fmt.Println(result)
 }
@@ -145,6 +151,7 @@ package main
 import (
 	"github.com/menaruben/GoScan"
 	"fmt"
+	"time"
 )
 
 func main() {
@@ -165,13 +172,14 @@ package main
 import (
 	"github.com/menaruben/GoScan"
 	"fmt"
+	"time"
 )
 
 func main() {
 	port_range := [2]int{20, 30}
 
 	// ScanHost scans all ports of a host with interval of 2 seconds between scans
-	result, runtime := ScanHost("localhost", port_range, 2)
+	result, runtime := ScanHost("localhost", port_range, 2, 12*time.Second)
 	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 
 	ResultOutput(result) // prints out result table to terminal

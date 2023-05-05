@@ -3,6 +3,7 @@ package GoScan_test
 import (
 	"fmt"
 	"github.com/menaruben/GoScan"
+	"time"
 )
 
 func ExampleValidateIpv4() {
@@ -20,7 +21,7 @@ func ExampleGetSubnetMask() {
 }
 
 func ExampleScanPort() {
-	sshResult := GoScan.ScanPort("localhost", 22, 12*time.Second)
+	sshResult := GoScan.ScanPort("localhost", 22, 12*time.Second, 12*time.Second)
 	fmt.Println(sshResult.Port, sshResult.State)
 	// Output:
 	// 22 true
@@ -31,7 +32,7 @@ func ExampleScanHost() {
 	port_range := [2]int{20, 30}
 
 	// scan each port with 2 seconds interval
-	result, runtime := GoScan.ScanHost("localhost", port_range, 2)
+	result, runtime := GoScan.ScanHost("localhost", port_range, 2, 12*time.Second)
 	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 	fmt.Println(result)
 	// Output:
@@ -44,7 +45,7 @@ func ExampleScanHostFast() {
 	port_range := [2]int{20, 30}
 
 	// scan ports concurrently
-	result, runtime := GoScan.ScanHostFast("localhost", port_range)
+	result, runtime := GoScan.ScanHostFast("localhost", port_range, 12*time.Second)
 	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 	fmt.Println(result)
 	// Output:
