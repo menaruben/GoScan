@@ -1,4 +1,4 @@
-module module github.com/menaruben/GoScan
+module module github.com/menaruben/GoScan/GoScan
 
 go 1.19
 
