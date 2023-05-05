@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GoScan"
+	GoScan "github.com/menaruben/GoScan"
 	"fmt"
 )
 
