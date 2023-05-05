@@ -121,14 +121,14 @@ func ScanPort(hostname string, port int, timeout time.Duration) ScanResult {
 }
 
 // ScanHost scans all ports inside the port_range argument and returns all open ports.
-func ScanHost(hostname string, port_range [2]int, scan_interval int) ([]ScanResult, time.Duration) {
+func ScanHost(hostname string, port_range [2]int, scan_interval int, timeout time.Duration) ([]ScanResult, time.Duration) {
 	start_time := time.Now()
 	var result []ScanResult
 	start := port_range[0]
 	end := port_range[1]
 
 	for i := start; i <= end; i++ {
-		port_result := ScanPort(hostname, i)
+		port_result := ScanPort(hostname, i, timeout)
 		if port_result.State {
 			result = append(result, port_result)
 		}
