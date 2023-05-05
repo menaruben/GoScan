@@ -2,9 +2,11 @@
 package GoScan
 
 import (
+	"math"
 	"net"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -44,7 +46,56 @@ var portServices = map[int]string{
 	8080: "HTTP (Alternative Port)",
 }
 
-// The ScanResult struct contains the port and its state (wether it is open or closed)
+// ValidateIpv4 returns a bool and checks wether the input is a valid IPv4 address.
+func ValidateIpv4(ipaddr string) bool {
+	octets := strings.Split(ipaddr, ".")
+
+	if len(octets) != 4 {
+		return false
+	}
+
+	for i := 0; i < 4; i++ {
+		num, err := strconv.Atoi(octets[i])
+		if err != nil {
+			return false
+		}
+
+		if num < 0 || num > 255 {
+			return false
+		}
+	}
+
+	return true
+}
+
+// GetSubnetMask returns the subnet mask in the x.x.x.x format and takes the subnet suffix as input.
+func GetSubnetMask(suffix int) string {
+	if suffix < 0 || suffix > 32 {
+		return ""
+	}
+
+	remainder := suffix % 8
+	lastOctet := int(math.Pow(2, float64((8 - remainder))))
+	previousOctetsNum := (suffix - remainder) / 8
+
+	var octets []string
+	for i := 0; i < previousOctetsNum; i++ {
+		octets = append(octets, "255")
+	}
+
+	octets = append(octets, strconv.Itoa(lastOctet))
+	var octetsMissing int = 4 - len(octets)
+
+	for i := 0; i < octetsMissing; i++ {
+		octets = append(octets, "0")
+	}
+
+	subnetMask := strings.Join(octets, ".")
+
+	return subnetMask
+}
+
+// ScanResult struct contains the port and its state as a boolean (open = true, closed = false).
 type ScanResult struct {
 	Port  int
 	State bool
@@ -120,8 +171,8 @@ func ScanHostFast(hostname string, port_range [2]int) ([]ScanResult, time.Durati
 	return openPorts, time.Since(start_time)
 }
 
-// The getService returns the service for the given port.
-func getService(port int) string {
+// The GetService returns the service for the given port.
+func GetService(port int) string {
 	_, ok := portServices[port]
 	if ok {
 		return portServices[port]
@@ -142,7 +193,7 @@ func ResultOutput(results []ScanResult) {
 		if res.State {
 			state = "open"
 		}
-		table.Append([]string{strconv.Itoa(res.Port), state, getService(res.Port)})
+		table.Append([]string{strconv.Itoa(res.Port), state, GetService(res.Port)})
 	}
 
 	table.Render()

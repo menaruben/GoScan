@@ -1,16 +1,20 @@
 package main
 
 import (
-	"GoScan"
 	"fmt"
+
+	GoScan "github.com/menaruben/GoScan"
 )
 
+// "GoScan"
+// "fmt"
+
 func main() {
-	port_range := [2]int{1, 30}
+	// scan ports 20 to 30
+	port_range := [2]int{20, 30}
 
-	// ScanHostFast concurrently scans all ports of a host
-	result, runtime := GoScan.ScanHost("localhost", port_range, 2)
+	// scan each port concurrently
+	result, runtime := GoScan.ScanHostFast("localhost", port_range)
 	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
-
-	GoScan.ResultOutput(result) // prints out result table to terminal
+	fmt.Println(result)
 }
