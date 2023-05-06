@@ -308,30 +308,22 @@ func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Durat
 func ScanNetHostsFast(network NetworkInfo, portRange [2]int, timeout time.Duration) [][]ScanResult {
 	var scanResults [][]ScanResult
 	var wg sync.WaitGroup
-	var hostname string
+	var mu sync.Mutex
 
-	resultsChan := make(chan []ScanResult)
-
-	for i := 0; i < len(network.Hosts); i++ {
+	for _, host := range network.Hosts {
 		wg.Add(1)
-		hostname = network.Hosts[i]
 
-		go func() {
+		go func(hostname string) {
+			defer wg.Done()
+
 			result, _ := ScanHostFast(hostname, portRange, timeout)
+
+			mu.Lock()
 			scanResults = append(scanResults, result)
-			resultsChan <- result
-			wg.Done()
-		}()
+			mu.Unlock()
+		}(host)
 	}
 
-	go func() {
-		wg.Wait()
-		close(resultsChan)
-	}()
-
-	for result := range resultsChan {
-		scanResults = append(scanResults, result)
-	}
-
+	wg.Wait()
 	return scanResults
 }

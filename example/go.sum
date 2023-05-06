@@ -16,5 +16,7 @@ github.com/menaruben/GoScan v0.1.13 h1:u+b8dpxeOSkEPAIzVxg9QGfWt/ACmT6PMA4xD80UV
 github.com/menaruben/GoScan v0.1.13/go.mod h1:RUolezJOPBMx+K4slGUxKo79v3dQOvtlaRMAb68C/U4=
 github.com/menaruben/GoScan v0.1.15 h1:5YchMpaG6cjI6EfpYAJaq6YYtLhndnLLe16HyAkoWOc=
 github.com/menaruben/GoScan v0.1.15/go.mod h1:RUolezJOPBMx+K4slGUxKo79v3dQOvtlaRMAb68C/U4=
+github.com/menaruben/GoScan v0.1.16 h1:75lBdP1V3/SK+LYNDmmmR863aaCvXZyeG0EnnqWDC18=
+github.com/menaruben/GoScan v0.1.16/go.mod h1:RUolezJOPBMx+K4slGUxKo79v3dQOvtlaRMAb68C/U4=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
