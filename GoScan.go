@@ -292,21 +292,22 @@ func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
 }
 
 // ScanNetHosts returns an array of an array of scan results of all hosts inside a network
-func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Duration, timeout time.Duration) [][]ScanResult {
-	var scanResults [][]ScanResult
+func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Duration, timeout time.Duration) [][2]any {
+	var scanResults [][2]any
 	var result []ScanResult
 
 	for i := 0; i < len(network.Hosts); i++ {
 		result, _ = ScanHost(network.Hosts[i], portRange, scanInterval, timeout)
-		scanResults = append(scanResults, result)
+		resultHost := [2]any{network.Hosts[i], result}
+		scanResults = append(scanResults, resultHost)
 	}
 
 	return scanResults
 }
 
 // ScanNetHostsFast returns an array of an array of scan results of all hosts inside a network
-func ScanNetHostsFast(network NetworkInfo, portRange [2]int, timeout time.Duration) [][]ScanResult {
-	var scanResults [][]ScanResult
+func ScanNetHostsFast(network NetworkInfo, portRange [2]int, timeout time.Duration) [][2]any {
+	var scanResults [][2]any
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 
@@ -318,8 +319,10 @@ func ScanNetHostsFast(network NetworkInfo, portRange [2]int, timeout time.Durati
 
 			result, _ := ScanHostFast(hostname, portRange, timeout)
 
+			// lock current variable to the go routine
 			mu.Lock()
-			scanResults = append(scanResults, result)
+			resultHost := [2]any{hostname, result}
+			scanResults = append(scanResults, resultHost)
 			mu.Unlock()
 		}(host)
 	}
