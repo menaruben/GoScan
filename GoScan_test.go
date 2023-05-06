@@ -95,6 +95,8 @@ func ExampleScanNetHosts() {
 	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
 	myResult := GoScan.ScanNetHosts(myNetwork, portRange, 0*time.Second, 12*time.Second)
 	fmt.Println(myResult)
+	// Output:
+	// [[192.168.1.74 []] [192.168.1.19 [{22 true}]]
 }
 
 func ExampleScanNetHostsFast() {
@@ -102,4 +104,6 @@ func ExampleScanNetHostsFast() {
 	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
 	myResult := GoScan.ScanNetHostsFast(myNetwork, portRange, 12*time.Second)
 	fmt.Println(myResult)
+	// Output:
+	// [[192.168.1.19 [{22 true}]] [192.168.1.74 []]
 }

@@ -93,11 +93,11 @@ import (
 )
 
 func main() {
-    port_range := [2]int{1, 1024}
+    portRange := [2]int{1, 1024}
     timeout := 12*time.Second
 
     // ScanHostFast concurrently scans all ports of a host
-    result, runtime := GoScan.ScanHostFast("localhost", port_range, timeout)
+    result, runtime := GoScan.ScanHostFast("localhost", portRange, timeout)
     fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 
     GoScan.ResultOutput(result) // prints out result table to terminal
@@ -132,10 +132,10 @@ import (
 func main() {
     // scan ports 20 to 30
     timeout := 12*time.Second
-    port_range := [2]int{20, 30}
+	portRange := [2]int{20, 30}
 
     // scan each port with 2 seconds interval
-    result, runtime := GoScan.ScanHost("localhost", port_range, 2, timeout)
+    result, runtime := GoScan.ScanHost("localhost", portRange, 2, timeout)
     fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
     fmt.Println(result)
 }
@@ -179,10 +179,10 @@ import (
 )
 
 func main() {
-    port_range := [2]int{20, 30}
+	portRange := [2]int{20, 30}
 
     // ScanHost scans all ports of a host with interval of 2 seconds between scans
-    result, runtime := ScanHost("localhost", port_range, 2, 12*time.Second)
+    result, runtime := ScanHost("localhost", portRange, 2, 12*time.Second)
     fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 
     ResultOutput(result) // prints out result table to terminal
@@ -247,6 +247,39 @@ Output:
 ```
 {192.168.1.0 255.255.255.0 24 [192.168.1.19 192.168.1.4 192.168.1.101]}
 ```
+
+### ScanNetHosts / ScanNetHostsFast
+These two functions return an array of arrays which contain the hostname and their open ports. Here is an example on how to use these functions:
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/menaruben/GoScan"
+)
+
+func main() {
+	portRange := [2]int{20, 30}
+	// get all reachable hosts inside network
+	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+
+	// not concurrently (might take a while)
+	myResult := GoScan.ScanNetHosts(myNetwork, portRange, 2*time.Second, 12*time.Second)
+	
+	// concurrently
+	myFastResult := GoScan.ScanNetHostsFast(myNetwork, portRange, 12*time.Second)
+
+	fmt.Println(myFastResult)
+	fmt.Print(myResult)
+}
+```
+Output: 
+````
+[[192.168.1.19 [{22 true}]] [192.168.1.74 []]
+[[192.168.1.74 []] [192.168.1.19 [{22 true}]]
+````
 
 ## License
 ```
