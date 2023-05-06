@@ -8,6 +8,9 @@ Move to your folder containing your go.mod and type:
 go get github.com/menaruben/GoScan
 ```
 
+## Future features
+If you have ideas what could be added to this go module please let me now and file an [issue](https://github.com/menaruben/GoScan/issues) with your idea and examples of the usage. 
+
 ## Examples
 ### ValidateIpv4
 We always need to pass in ip addresses or hostnames. When we parse out the IP addresses from somewhere we can try to vaildate the parsed string with ```ValidateIpv4``` so that we can avoid errors when passing in wrong ip addresses. Here is an example on how to use it:
