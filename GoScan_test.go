@@ -77,14 +77,14 @@ func ExampleResultOutput() {
 }
 
 func ExampleIsIPReachable() {
-	var validCheck bool = IsIPReachable("142.250.203.100", 12*time.Second)
+	var validCheck bool = GoScan.IsIPReachable("142.250.203.100", 12*time.Second)
 	fmt.Println(validCheck)
 	// Output:
 	// true
 }
 
 func ExampleScanNetwork() {
-	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 0, 12*time.Second)
+	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
 	fmt.Println(myNetwork)
 	// Output:
 	// {192.168.1.0 255.255.255.0 24 [192.168.1.19 192.168.1.4 192.168.1.101]}

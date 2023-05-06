@@ -227,8 +227,8 @@ func incrementHostIp(ip net.IP) {
 	}
 }
 
-// ScanNetwork returns NetworkInfo about a specific network. It contains the network IP, subnet mask/suffix and all hosts
-func ScanNetwork(netaddr string, scan_interval int, timeout time.Duration) NetworkInfo {
+// ScanNetwork returns NetworkInfo about a specific network. It contains the network IP, subnet mask/suffix and all hosts.
+func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
 	var network NetworkInfo
 	netaddrFields := strings.Split(netaddr, "/")
 
@@ -259,7 +259,6 @@ func ScanNetwork(netaddr string, scan_interval int, timeout time.Duration) Netwo
 				hostChannel <- ip
 			}
 		}(ip.String())
-		time.Sleep(time.Duration(scan_interval) * time.Second)
 	}
 
 	// Wait for all goroutines to complete before closing the channel

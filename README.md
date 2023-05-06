@@ -236,7 +236,7 @@ import (
 )
 
 func main() {
-	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 0, 12*time.Second)
+	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
 	fmt.Println(myNetwork)
 }
 ```
