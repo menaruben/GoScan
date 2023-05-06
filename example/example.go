@@ -8,8 +8,13 @@ import (
 )
 
 func main() {
-	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 0, 12*time.Second)
-	fmt.Println(myNetwork)
+	portRange := [2]int{20, 30}
+	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+	myResult := GoScan.ScanNetHostsFast(myNetwork, portRange, 12*time.Second)
+	fmt.Println(myNetwork.Hosts)
+	fmt.Println(myResult)
+
+	// fmt.Println(myNetwork)
 	// // scan port range
 	// port_range := [2]int{1, 1024}
 

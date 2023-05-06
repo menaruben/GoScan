@@ -2,7 +2,7 @@ module example
 
 go 1.19
 
-require github.com/menaruben/GoScan v0.1.13
+require github.com/menaruben/GoScan v0.1.15
 
 require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect

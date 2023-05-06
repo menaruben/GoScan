@@ -318,6 +318,7 @@ func ScanNetHostsFast(network NetworkInfo, portRange [2]int, timeout time.Durati
 
 		go func() {
 			result, _ := ScanHostFast(hostname, portRange, timeout)
+			scanResults = append(scanResults, result)
 			resultsChan <- result
 			wg.Done()
 		}()
