@@ -18,13 +18,13 @@ We always need to pass in ip addresses or hostnames. When we parse out the IP ad
 package main
 
 import (
-	"fmt"
-	"github.com/menaruben/GoScan"
+    "fmt"
+    "github.com/menaruben/GoScan"
 )
 
 func main() {
-	validCheck := GoScan.ValidateIpv4("192.168.100.29")
-	fmt.Println(validCheck)
+    validCheck := GoScan.ValidateIpv4("192.168.100.29")
+    fmt.Println(validCheck)
 }
 ```
 Output:
@@ -39,13 +39,13 @@ When scanning a network it is important to get certain information about the net
 package main
 
 import (
-	"fmt"
-	"github.com/menaruben/GoScan"
+    "fmt"
+    "github.com/menaruben/GoScan"
 )
 
 func main() {
-	subnetMask := GoScan.GetSubnetMask(25)
-	fmt.Println(subnetMask)
+    subnetMask := GoScan.GetSubnetMask(25)
+    fmt.Println(subnetMask)
 }
 ```
 Output:
@@ -59,18 +59,18 @@ In order to scan a single port(s) you can use the ```ScanPort``` function:
 package main
 
 import (
-	"github.com/menaruben/GoScan"
-	"fmt"
-	"time"
+    "github.com/menaruben/GoScan"
+    "fmt"
+    "time"
 )
 
 func main() {
-	timeout := 12*time.Second
-	sshResult := GoScan.ScanPort("localhost", 22, timeout)
-	httpResult := GoScan.ScanPort("localhost", 80, timeout)
+    timeout := 12*time.Second
+    sshResult := GoScan.ScanPort("localhost", 22, timeout)
+    httpResult := GoScan.ScanPort("localhost", 80, timeout)
 
-	fmt.Println(sshResult.Port, sshResult.State)
-	fmt.Println(httpResult.Port, httpResult.State)
+    fmt.Println(sshResult.Port, sshResult.State)
+    fmt.Println(httpResult.Port, httpResult.State)
 }
 ```
 Output:
@@ -87,14 +87,14 @@ In order to scan a port range concurrently you will need to use the ```ScanHostF
 package main
 
 import (
-	"github.com/menaruben/GoScan"
-	"fmt"
-	"time"
+    "github.com/menaruben/GoScan"
+    "fmt"
+    "time"
 )
 
 func main() {
     port_range := [2]int{1, 1024}
-	timeout := 12*time.Second
+    timeout := 12*time.Second
 
     // ScanHostFast concurrently scans all ports of a host
     result, runtime := GoScan.ScanHostFast("localhost", port_range, timeout)
@@ -124,20 +124,20 @@ In order to less obvious when scanning a network we can use the ```ScanHost``` f
 package main
 
 import (
-	"github.com/menaruben/GoScan"
-	"fmt"
-	"time"
+    "github.com/menaruben/GoScan"
+    "fmt"
+    "time"
 )
 
 func main() {
-	// scan ports 20 to 30
-	timeout := 12*time.Second
-	port_range := [2]int{20, 30}
+    // scan ports 20 to 30
+    timeout := 12*time.Second
+    port_range := [2]int{20, 30}
 
-	// scan each port with 2 seconds interval
-	result, runtime := GoScan.ScanHost("localhost", port_range, 2, timeout)
-	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
-	fmt.Println(result)
+    // scan each port with 2 seconds interval
+    result, runtime := GoScan.ScanHost("localhost", port_range, 2, timeout)
+    fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
+    fmt.Println(result)
 }
 ```
 Output:
@@ -152,14 +152,14 @@ This function returns the service that is mapped to the port given as the argume
 package main
 
 import (
-	"github.com/menaruben/GoScan"
-	"fmt"
-	"time"
+    "github.com/menaruben/GoScan"
+    "fmt"
+    "time"
 )
 
 func main() {
-	service := GoScan.GetService(22)
-	fmt.Println(service)
+    service := GoScan.GetService(22)
+    fmt.Println(service)
 }
 ```
 Output:
@@ -173,19 +173,19 @@ The ```ResultOutput``` function prints out the ```[]ScanResult``` given as an ar
 package main
 
 import (
-	"github.com/menaruben/GoScan"
-	"fmt"
-	"time"
+    "github.com/menaruben/GoScan"
+    "fmt"
+    "time"
 )
 
 func main() {
-	port_range := [2]int{20, 30}
+    port_range := [2]int{20, 30}
 
-	// ScanHost scans all ports of a host with interval of 2 seconds between scans
-	result, runtime := ScanHost("localhost", port_range, 2, 12*time.Second)
-	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
+    // ScanHost scans all ports of a host with interval of 2 seconds between scans
+    result, runtime := ScanHost("localhost", port_range, 2, 12*time.Second)
+    fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 
-	ResultOutput(result) // prints out result table to terminal
+    ResultOutput(result) // prints out result table to terminal
 }
 ```
 Output:
@@ -204,13 +204,13 @@ This function checks wether or not an IP is reachable or not and returns the boo
 package main
 
 import (
-	"github.com/menaruben/GoScan"
-	"fmt"
+    "github.com/menaruben/GoScan"
+    "fmt"
 )
 
 func main() {
-	var validCheck bool = IsIPReachable("142.250.203.100", 12*time.Second)
-	fmt.Println(validCheck)
+    var validCheck bool = IsIPReachable("142.250.203.100", 12*time.Second)
+    fmt.Println(validCheck)
 }
 ```
 Output:
@@ -222,10 +222,10 @@ true
 This function scans a network and returns a variable of type ```NetworkInfo``` which is defined like this:
 ```go
 type NetworkInfo struct {
-	NetworkIP    string
-	SubnetMask   string
-	SubnetSuffix int
-	Hosts        []string
+    NetworkIP    string
+    SubnetMask   string
+    SubnetSuffix int
+    Hosts        []string
 }
 ```
 
@@ -234,13 +234,13 @@ In order to scan a network we need to use the following code:
 package main
 
 import (
-	"github.com/menaruben/GoScan"
-	"fmt"
+    "github.com/menaruben/GoScan"
+    "fmt"
 )
 
 func main() {
-	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
-	fmt.Println(myNetwork)
+    myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+    fmt.Println(myNetwork)
 }
 ```
 Output:
