@@ -2,6 +2,7 @@
 package GoScan
 
 import (
+	"github.com/menaruben/GoScan"
 	"log"
 	"math"
 	"net"
@@ -291,6 +292,15 @@ func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
 	return network
 }
 
+func getPortsFromResults(scanResults []GoScan.ScanResult) []int {
+	var portNumbers []int
+	for _, result := range scanResults {
+		portNumbers = append(portNumbers, result.Port)
+	}
+
+	return portNumbers
+}
+
 // ScanNetHosts returns an array of an array of scan results of all hosts inside a network
 func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Duration, timeout time.Duration) [][2]any {
 	var scanResults [][2]any
@@ -298,7 +308,8 @@ func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Durat
 
 	for i := 0; i < len(network.Hosts); i++ {
 		result, _ = ScanHost(network.Hosts[i], portRange, scanInterval, timeout)
-		resultHost := [2]any{network.Hosts[i], result}
+		resultPort := getPortsFromResults(result)
+		resultHost := [2]any{network.Hosts[i], resultPort}
 		scanResults = append(scanResults, resultHost)
 	}
 
@@ -321,7 +332,8 @@ func ScanNetHostsFast(network NetworkInfo, portRange [2]int, timeout time.Durati
 
 			// lock current variable to the go routine
 			mu.Lock()
-			resultHost := [2]any{hostname, result}
+			resultPort := getPortsFromResults(result)
+			resultHost := [2]any{hostname, resultPort}
 			scanResults = append(scanResults, resultHost)
 			mu.Unlock()
 		}(host)

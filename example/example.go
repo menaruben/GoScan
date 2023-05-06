@@ -14,7 +14,7 @@ func main() {
 	myResult := GoScan.ScanNetHosts(myNetwork, portRange, 2*time.Second, 12*time.Second)
 	myFastResult := GoScan.ScanNetHostsFast(myNetwork, portRange, 12*time.Second)
 
-	//fmt.Println(myNetwork.Hosts)
+	fmt.Println(myNetwork.Hosts)
 	fmt.Println(myFastResult)
 	fmt.Print(myResult)
 
