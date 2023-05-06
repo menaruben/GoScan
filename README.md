@@ -9,7 +9,7 @@ go get github.com/menaruben/GoScan
 ```
 
 ## Future features
-If you have ideas what could be added to this go module please let me now and file an [issue](https://github.com/menaruben/GoScan/issues) with your idea and examples of the usage. 
+If you have ideas what could be added to this go module please let me now and file an [issue](https://github.com/menaruben/GoScan/issues) with your idea and examples of the usage.
 
 ## Examples
 ### ValidateIpv4
