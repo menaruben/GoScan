@@ -2,7 +2,6 @@
 package GoScan
 
 import (
-	"github.com/menaruben/GoScan"
 	"log"
 	"math"
 	"net"
@@ -292,7 +291,7 @@ func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
 	return network
 }
 
-func getPortsFromResults(scanResults []GoScan.ScanResult) []int {
+func getPortsFromResults(scanResults []ScanResult) []int {
 	var portNumbers []int
 	for _, result := range scanResults {
 		portNumbers = append(portNumbers, result.Port)
