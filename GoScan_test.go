@@ -29,10 +29,10 @@ func ExampleScanPort() {
 
 func ExampleScanHost() {
 	// scan ports 20 to 30
-	port_range := [2]int{20, 30}
+	portRange := [2]int{20, 30}
 
 	// scan each port with 2 seconds interval
-	result, runtime := GoScan.ScanHost("localhost", port_range, 2, 12*time.Second)
+	result, runtime := GoScan.ScanHost("localhost", portRange, 2*time.Second, 12*time.Second)
 	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 	fmt.Println(result)
 	// Output:
@@ -42,10 +42,10 @@ func ExampleScanHost() {
 
 func ExampleScanHostFast() {
 	// scan ports 20 to 30
-	port_range := [2]int{20, 30}
+	portRange := [2]int{20, 30}
 
 	// scan ports concurrently
-	result, runtime := GoScan.ScanHostFast("localhost", port_range, 12*time.Second)
+	result, runtime := GoScan.ScanHostFast("localhost", portRange, 12*time.Second)
 	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
 	fmt.Println(result)
 	// Output:
@@ -62,10 +62,10 @@ func ExampleGetService() {
 
 func ExampleResultOutput() {
 	// scan ports 20 to 30
-	port_range := [2]int{20, 30}
+	portRange := [2]int{20, 30}
 
 	// scan ports concurrently
-	result, _ := GoScan.ScanHostFast("localhost", port_range)
+	result, _ := GoScan.ScanHostFast("localhost", portRange, 12*time.Second)
 
 	GoScan.ResultOutput(result)
 	// Output:
@@ -88,4 +88,18 @@ func ExampleScanNetwork() {
 	fmt.Println(myNetwork)
 	// Output:
 	// {192.168.1.0 255.255.255.0 24 [192.168.1.19 192.168.1.4 192.168.1.101]}
+}
+
+func ExampleScanNetHosts() {
+	portRange := [2]int{20, 30}
+	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+	myResult := GoScan.ScanNetHosts(myNetwork, portRange, 0*time.Second, 12*time.Second)
+	fmt.Println(myResult)
+}
+
+func ExampleScanNetHostsFast() {
+	portRange := [2]int{20, 30}
+	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+	myResult := GoScan.ScanNetHostsFast(myNetwork, portRange, 12*time.Second)
+	fmt.Println(myResult)
 }

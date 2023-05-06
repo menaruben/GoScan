@@ -1,4 +1,4 @@
-// GoScan is a blanzingly fast network/port scanner written in Go.
+// Package GoScan is a blanzingly fast network/port scanner written in Go
 package GoScan
 
 import (
@@ -114,40 +114,45 @@ func ScanPort(hostname string, port int, timeout time.Duration) ScanResult {
 		return result
 	}
 
-	defer conn.Close()
+	defer func(conn net.Conn) {
+		err := conn.Close()
+		if err != nil {
+
+		}
+	}(conn)
 
 	result.State = true
 	return result
 }
 
-// ScanHost scans all ports inside the port_range argument and returns all open ports.
-func ScanHost(hostname string, port_range [2]int, scan_interval int, timeout time.Duration) ([]ScanResult, time.Duration) {
-	start_time := time.Now()
+// ScanHost scans all ports inside the portRange argument and returns all open ports.
+func ScanHost(hostname string, portRange [2]int, scanInterval time.Duration, timeout time.Duration) ([]ScanResult, time.Duration) {
+	startTime := time.Now()
 	var result []ScanResult
-	start := port_range[0]
-	end := port_range[1]
+	start := portRange[0]
+	end := portRange[1]
 
 	for i := start; i <= end; i++ {
-		port_result := ScanPort(hostname, i, timeout)
-		if port_result.State {
-			result = append(result, port_result)
+		portResult := ScanPort(hostname, i, timeout)
+		if portResult.State {
+			result = append(result, portResult)
 		}
-		time.Sleep(time.Duration(scan_interval) * time.Second)
+		time.Sleep(scanInterval)
 	}
 
-	return result, time.Since(start_time)
+	return result, time.Since(startTime)
 }
 
-// ScanHostFast scans all ports inside the port_range argument concurrently and returns all open ports.
-func ScanHostFast(hostname string, port_range [2]int, timeout time.Duration) ([]ScanResult, time.Duration) {
-	start_time := time.Now()
+// ScanHostFast scans all ports inside the portRange argument concurrently and returns all open ports.
+func ScanHostFast(hostname string, portRange [2]int, timeout time.Duration) ([]ScanResult, time.Duration) {
+	startTime := time.Now()
 	var wg sync.WaitGroup
 
 	// create a channel to receive the scan results
 	results := make(chan ScanResult)
 
 	// launch goroutine for each port in the range
-	for port := port_range[0]; port <= port_range[1]; port++ {
+	for port := portRange[0]; port <= portRange[1]; port++ {
 		wg.Add(1)
 		go func(port int) {
 			defer wg.Done()
@@ -169,7 +174,7 @@ func ScanHostFast(hostname string, port_range [2]int, timeout time.Duration) ([]
 		}
 	}
 
-	return openPorts, time.Since(start_time)
+	return openPorts, time.Since(startTime)
 }
 
 // The GetService returns the service for the given port.
@@ -188,7 +193,7 @@ func ResultOutput(results []ScanResult) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Port", "State", "Service"})
 
-	// append restults to table
+	// append results to table
 	for _, res := range results {
 		state := "closed"
 		if res.State {
@@ -200,7 +205,7 @@ func ResultOutput(results []ScanResult) {
 	table.Render()
 }
 
-// Contains information about a network.
+// NetworkInfo contains information about a network.
 type NetworkInfo struct {
 	NetworkIP    string
 	SubnetMask   string
@@ -208,13 +213,17 @@ type NetworkInfo struct {
 	Hosts        []string
 }
 
-// returns wether or not an IP address is reachacble
+// IsIPReachable returns if an IP address is reachable
 func IsIPReachable(ipAddr string, timeout time.Duration) bool {
 	conn, err := net.DialTimeout("tcp", ipAddr+":80", timeout)
 	if err != nil {
 		return false
 	}
-	conn.Close()
+
+	err = conn.Close()
+	if err != nil {
+		return false
+	}
 	return true
 }
 
@@ -280,4 +289,48 @@ func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
 	}
 
 	return network
+}
+
+// ScanNetHosts returns an array of an array of scan results of all hosts inside a network
+func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Duration, timeout time.Duration) [][]ScanResult {
+	var scanResults [][]ScanResult
+	var result []ScanResult
+
+	for i := 0; i < len(network.Hosts); i++ {
+		result, _ = ScanHost(network.Hosts[i], portRange, scanInterval, timeout)
+		scanResults = append(scanResults, result)
+	}
+
+	return scanResults
+}
+
+// ScanNetHostsFast returns an array of an array of scan results of all hosts inside a network
+func ScanNetHostsFast(network NetworkInfo, portRange [2]int, timeout time.Duration) [][]ScanResult {
+	var scanResults [][]ScanResult
+	var wg sync.WaitGroup
+	var hostname string
+
+	resultsChan := make(chan []ScanResult)
+
+	for i := 0; i < len(network.Hosts); i++ {
+		wg.Add(1)
+		hostname = network.Hosts[i]
+
+		go func() {
+			result, _ := ScanHostFast(hostname, portRange, timeout)
+			resultsChan <- result
+			wg.Done()
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(resultsChan)
+	}()
+
+	for result := range resultsChan {
+		scanResults = append(scanResults, result)
+	}
+
+	return scanResults
 }
