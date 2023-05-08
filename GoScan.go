@@ -48,25 +48,25 @@ var portServices = map[int]string{
 }
 
 // ValidateIpv4 returns a bool and checks wether the input is a valid IPv4 address.
-func ValidateIpv4(ipaddr string) bool {
+func ValidateIpv4(ipaddr string) (bool, error) {
 	octets := strings.Split(ipaddr, ".")
 
 	if len(octets) != 4 {
-		return false
+		return false, nil
 	}
 
 	for i := 0; i < 4; i++ {
 		num, err := strconv.Atoi(octets[i])
 		if err != nil {
-			return false
+			return false, err
 		}
 
 		if num < 0 || num > 255 {
-			return false
+			return false, nil
 		}
 	}
 
-	return true
+	return true, nil
 }
 
 // GetSubnetMask returns the subnet mask in the x.x.x.x format and takes the subnet suffix as input.
@@ -76,7 +76,7 @@ func GetSubnetMask(suffix int) string {
 	}
 
 	remainder := suffix % 8
-	lastOctet := 256 - int(math.Pow(2, float64((8-remainder))))
+	lastOctet := 256 - int(math.Pow(2, float64(8-remainder)))
 	previousOctetsNum := (suffix - remainder) / 8
 
 	var octets []string
@@ -103,7 +103,7 @@ type ScanResult struct {
 }
 
 // ScanPort scans a single port.
-func ScanPort(hostname string, port int, timeout time.Duration) ScanResult {
+func ScanPort(hostname string, port int, timeout time.Duration) (ScanResult, error) {
 	result := ScanResult{Port: port}
 	address := hostname + ":" + strconv.Itoa(port)
 
@@ -111,41 +111,41 @@ func ScanPort(hostname string, port int, timeout time.Duration) ScanResult {
 
 	if err != nil {
 		result.State = false
-		return result
+		return result, err
 	}
 
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {
-
 		}
 	}(conn)
 
 	result.State = true
-	return result
+	return result, nil
 }
 
 // ScanHost scans all ports inside the portRange argument and returns all open ports.
-func ScanHost(hostname string, portRange [2]int, scanInterval time.Duration, timeout time.Duration) ([]ScanResult, time.Duration) {
-	startTime := time.Now()
+func ScanHost(hostname string, portRange [2]int, scanInterval time.Duration, timeout time.Duration) ([]ScanResult, error) {
 	var result []ScanResult
 	start := portRange[0]
 	end := portRange[1]
 
 	for i := start; i <= end; i++ {
-		portResult := ScanPort(hostname, i, timeout)
+		portResult, err := ScanPort(hostname, i, timeout)
+		if err != nil {
+			return result, err
+		}
 		if portResult.State {
 			result = append(result, portResult)
 		}
 		time.Sleep(scanInterval)
 	}
 
-	return result, time.Since(startTime)
+	return result, nil
 }
 
 // ScanHostFast scans all ports inside the portRange argument concurrently and returns all open ports.
-func ScanHostFast(hostname string, portRange [2]int, timeout time.Duration) ([]ScanResult, time.Duration) {
-	startTime := time.Now()
+func ScanHostFast(hostname string, portRange [2]int, timeout time.Duration) []ScanResult {
 	var wg sync.WaitGroup
 
 	// create a channel to receive the scan results
@@ -156,7 +156,8 @@ func ScanHostFast(hostname string, portRange [2]int, timeout time.Duration) ([]S
 		wg.Add(1)
 		go func(port int) {
 			defer wg.Done()
-			results <- ScanPort(hostname, port, timeout)
+			portResult, _ := ScanPort(hostname, port, timeout)
+			results <- portResult
 		}(port)
 	}
 
@@ -174,7 +175,7 @@ func ScanHostFast(hostname string, portRange [2]int, timeout time.Duration) ([]S
 		}
 	}
 
-	return openPorts, time.Since(startTime)
+	return openPorts
 }
 
 // The GetService returns the service for the given port.
@@ -214,17 +215,17 @@ type NetworkInfo struct {
 }
 
 // IsIPReachable returns if an IP address is reachable
-func IsIPReachable(ipAddr string, timeout time.Duration) bool {
+func IsIPReachable(ipAddr string, timeout time.Duration) (bool, error) {
 	conn, err := net.DialTimeout("tcp", ipAddr+":80", timeout)
 	if err != nil {
-		return false
+		return false, err
 	}
 
 	err = conn.Close()
 	if err != nil {
-		return false
+		return false, err
 	}
-	return true
+	return true, nil
 }
 
 func incrementHostIp(ip net.IP) {
@@ -237,7 +238,7 @@ func incrementHostIp(ip net.IP) {
 }
 
 // ScanNetwork returns NetworkInfo about a specific network. It contains the network IP, subnet mask/suffix and all hosts.
-func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
+func ScanNetwork(netaddr string, timeout time.Duration) (NetworkInfo, error) {
 	var network NetworkInfo
 	netaddrFields := strings.Split(netaddr, "/")
 
@@ -253,7 +254,7 @@ func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
 	// get all hosts inside the network
 	ip, ipNet, err := net.ParseCIDR(netaddr)
 	if err != nil {
-		log.Fatal(err)
+		return network, err
 	}
 
 	hostChannel := make(chan string)
@@ -264,7 +265,8 @@ func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
 		wg.Add(1)
 		go func(ip string) {
 			defer wg.Done()
-			if IsIPReachable(ip, timeout) {
+			ipReachable, _ := IsIPReachable(ip, timeout)
+			if ipReachable {
 				hostChannel <- ip
 			}
 		}(ip.String())
@@ -288,7 +290,7 @@ func ScanNetwork(netaddr string, timeout time.Duration) NetworkInfo {
 		network.Hosts = network.Hosts[1 : len(network.Hosts)-1]
 	}
 
-	return network
+	return network, nil
 }
 
 func getPortsFromResults(scanResults []ScanResult) []int {
@@ -301,18 +303,18 @@ func getPortsFromResults(scanResults []ScanResult) []int {
 }
 
 // ScanNetHosts returns an array of an array of scan results of all hosts inside a network
-func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Duration, timeout time.Duration) [][2]any {
+func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Duration, timeout time.Duration) ([][2]any, []error) {
 	var scanResults [][2]any
-	var result []ScanResult
+	var errors []error
 
 	for i := 0; i < len(network.Hosts); i++ {
-		result, _ = ScanHost(network.Hosts[i], portRange, scanInterval, timeout)
+		result, err := ScanHost(network.Hosts[i], portRange, scanInterval, timeout)
 		resultPort := getPortsFromResults(result)
 		resultHost := [2]any{network.Hosts[i], resultPort}
 		scanResults = append(scanResults, resultHost)
+		errors = append(errors, err)
 	}
-
-	return scanResults
+	return scanResults, errors
 }
 
 // ScanNetHostsFast returns an array of an array of scan results of all hosts inside a network
@@ -327,7 +329,7 @@ func ScanNetHostsFast(network NetworkInfo, portRange [2]int, timeout time.Durati
 		go func(hostname string) {
 			defer wg.Done()
 
-			result, _ := ScanHostFast(hostname, portRange, timeout)
+			result := ScanHostFast(hostname, portRange, timeout)
 
 			// lock current variable to the go routine
 			mu.Lock()
