@@ -2,12 +2,15 @@ package GoScan_test
 
 import (
 	"fmt"
-	"github.com/menaruben/GoScan"
+	GoScan "github.com/menaruben/GoScan"
 	"time"
 )
 
 func ExampleValidateIpv4() {
-	validCheck := GoScan.ValidateIpv4("192.168.100.29")
+	validCheck, err := GoScan.ValidateIpv4("192.168.100.29")
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(validCheck)
 	// Output:
 	// true
@@ -21,7 +24,10 @@ func ExampleGetSubnetMask() {
 }
 
 func ExampleScanPort() {
-	sshResult := GoScan.ScanPort("localhost", 22, 12*time.Second)
+	sshResult, err := GoScan.ScanPort("localhost", 22, 12*time.Second)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(sshResult.Port, sshResult.State)
 	// Output:
 	// 22 true
@@ -32,8 +38,10 @@ func ExampleScanHost() {
 	portRange := [2]int{20, 30}
 
 	// scan each port with 2 seconds interval
-	result, runtime := GoScan.ScanHost("localhost", portRange, 2*time.Second, 12*time.Second)
-	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
+	result, err := GoScan.ScanHost("localhost", portRange, 2*time.Second, 12*time.Second)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(result)
 	// Output:
 	// Port scanning finished in 45.630600 seconds
@@ -45,11 +53,9 @@ func ExampleScanHostFast() {
 	portRange := [2]int{20, 30}
 
 	// scan ports concurrently
-	result, runtime := GoScan.ScanHostFast("localhost", portRange, 12*time.Second)
-	fmt.Printf("Port scanning finished in %f seconds\n", runtime.Seconds())
+	result := GoScan.ScanHostFast("localhost", portRange, 12*time.Second)
 	fmt.Println(result)
 	// Output:
-	// Port scanning finished in 2.352606 seconds
 	// [{22 true}]
 }
 
@@ -65,8 +71,7 @@ func ExampleResultOutput() {
 	portRange := [2]int{20, 30}
 
 	// scan ports concurrently
-	result, _ := GoScan.ScanHostFast("localhost", portRange, 12*time.Second)
-
+	result := GoScan.ScanHostFast("localhost", portRange, 12*time.Second)
 	GoScan.ResultOutput(result)
 	// Output:
 	// +------+-------+--------------------+
@@ -77,14 +82,20 @@ func ExampleResultOutput() {
 }
 
 func ExampleIsIPReachable() {
-	var validCheck bool = GoScan.IsIPReachable("142.250.203.100", 12*time.Second)
+	validCheck, err := GoScan.IsIPReachable("142.250.203.100", 12*time.Second)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(validCheck)
 	// Output:
 	// true
 }
 
 func ExampleScanNetwork() {
-	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+	myNetwork, err := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(myNetwork)
 	// Output:
 	// {192.168.1.0 255.255.255.0 24 [192.168.1.19 192.168.1.4 192.168.1.101]}
@@ -92,8 +103,11 @@ func ExampleScanNetwork() {
 
 func ExampleScanNetHosts() {
 	portRange := [2]int{20, 30}
-	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
-	myResult := GoScan.ScanNetHosts(myNetwork, portRange, 0*time.Second, 12*time.Second)
+	myNetwork, _ := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+	myResult, err := GoScan.ScanNetHosts(myNetwork, portRange, 0*time.Second, 12*time.Second)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(myResult)
 	// Output:
 	// [[192.168.1.74 []] [192.168.1.19 [{22 true}]]
@@ -101,8 +115,13 @@ func ExampleScanNetHosts() {
 
 func ExampleScanNetHostsFast() {
 	portRange := [2]int{20, 30}
-	myNetwork := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+	myNetwork, err := GoScan.ScanNetwork("192.168.1.0/24", 12*time.Second)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	myResult := GoScan.ScanNetHostsFast(myNetwork, portRange, 12*time.Second)
+
 	fmt.Println(myResult)
 	// Output:
 	// [[192.168.1.19 [{22 true}]] [192.168.1.74 []]
