@@ -309,11 +309,16 @@ func ScanNetHosts(network NetworkInfo, portRange [2]int, scanInterval time.Durat
 
 	for i := 0; i < len(network.Hosts); i++ {
 		result, err := ScanHost(network.Hosts[i], portRange, scanInterval, timeout)
-		resultPort := getPortsFromResults(result)
-		resultHost := [2]any{network.Hosts[i], resultPort}
-		scanResults = append(scanResults, resultHost)
-		errors = append(errors, err)
+		if err != nil {
+			errors = append(errors, err)
+		} else {
+			resultPort := getPortsFromResults(result)
+			resultHost := [2]any{network.Hosts[i], resultPort}
+			scanResults = append(scanResults, resultHost)
+		}
+		time.Sleep(scanInterval)
 	}
+
 	return scanResults, errors
 }
 
