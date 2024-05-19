@@ -1,8 +1,8 @@
 # GoScan
-GoScan is a blanzingly fast network/port scanner written in Go. 
+GoScan is a network/port scanner written in Go. 
 
 ## Installation
-> ⚠️ **_NOTE:_**  This module is under heavy development. If any errors occur please file an [issue](https://github.com/menaruben/GoScan/issues).
+> ⚠️ **_NOTE:_**  This repository is still under development and not optimized. If any errors occur please file an [issue](https://github.com/menaruben/GoScan/issues).
 Move to your folder containing your go.mod and type:
 ```
 go get github.com/menaruben/GoScan
